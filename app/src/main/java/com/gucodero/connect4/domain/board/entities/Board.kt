@@ -8,7 +8,7 @@ class Board(
     private val maxConnected: Int
 ) {
 
-    val matrix: List<MutableList<BoardItem>>
+    private val matrix: List<MutableList<BoardItem>>
     val isFull get() = matrix.find { row -> row.find { it is BoardItem.Empty } != null } == null
 
     init {

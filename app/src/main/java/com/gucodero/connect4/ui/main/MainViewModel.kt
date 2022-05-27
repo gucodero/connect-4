@@ -9,13 +9,16 @@ import com.gucodero.connect4.domain.game.entities.GameStatus
 import com.gucodero.connect4.domain.game.entities.GameTurn
 import com.gucodero.connect4.domain.game.use_cases.NewGameUseCase
 import com.gucodero.connect4.domain.game.use_cases.ResetGameUseCase
+import com.gucodero.connect4.domain.player.entities.Player
 
 class MainViewModel(
+    private val player1: String,
+    private val player2: String,
     private val newGameUseCase: NewGameUseCase = NewGameUseCase(),
     private val resetGameUseCase: ResetGameUseCase = ResetGameUseCase()
 ): ViewModel() {
 
-    private var game: Game = newGameUseCase("Pablo", "Francisco")
+    private var game: Game = newGameUseCase(player1, player2)
 
     private var _uiState by mutableStateOf(createNewState())
     val uiState get() = _uiState
@@ -35,7 +38,7 @@ class MainViewModel(
             return null
         }
         game.selectItem(x)?.let { gameTurn ->
-            uiState.matrix[gameTurn.getId()] = gameTurn.player
+            uiState.matrix[gameTurn.x to gameTurn.y] = gameTurn.player.color
             refreshTurn()
             return gameTurn
         }
@@ -55,7 +58,7 @@ class MainViewModel(
     }
 
     fun newGame(){
-        game = newGameUseCase("Pablo", "Francisco")
+        game = newGameUseCase(player1, player2)
         _uiState = createNewState()
     }
 
