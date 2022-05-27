@@ -1,8 +1,10 @@
 <resources>
-    <string name="app_name">Connect4</string>
+    <string name="app_name">Connect 4</string>
     <string name="score">Score</string>
     <string name="won">¡%s GANA!</string>
     <string name="retry">Volver a jugar</string>
     <string name="tied">¡Empate!</string>
     <string name="new_game">Nuevo Juego</string>
+    <string name="player">Player %s</string>
+    <string name="to_play">Jugar</string>
 </resources>

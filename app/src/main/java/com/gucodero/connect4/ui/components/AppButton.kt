@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 fun AppButton(
     modifier: Modifier = Modifier,
     text: String,
+    enabled: Boolean = true,
     onClick: () -> Unit
 ){
     Button(
@@ -33,6 +34,7 @@ fun AppButton(
                 shape = MaterialTheme.shapes.small
             ),
         onClick = onClick,
+        enabled = enabled
     ) {
         Text(
             text = text,
