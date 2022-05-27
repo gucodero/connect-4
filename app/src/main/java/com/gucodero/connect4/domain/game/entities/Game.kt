@@ -8,7 +8,7 @@ import com.gucodero.connect4.domain.player.entities.Player
 data class Game(
     val players: List<Player>,
     val board: Board = Board(
-        width = 7,
+        width = 6,
         height = 6,
         maxConnected = 4
     )
@@ -20,17 +20,16 @@ data class Game(
     private var _status: GameStatus
     val status get() = _status
 
-    val matrix get() = board.matrix
     val height get() = board.height
     val width get() = board.width
 
     init {
         selectPlayer()
-        _status = GameStatus.DEFAULT
+        _status = GameStatus.None
     }
 
     private fun selectPlayer() {
-        _playerTurn = if(_playerTurn === Player.EMPTY){
+        _playerTurn = if(_playerTurn.id == Player.EMPTY.id){
             players.first()
         } else {
             val indexCurrentPlayer = players.indexOf(_playerTurn)
@@ -43,11 +42,13 @@ data class Game(
         }
     }
 
-    fun selectItem(x: Int): Boolean {
+    fun selectItem(x: Int): GameTurn? {
         val result = board.selectItem(x = x, player = playerTurn)
         if(result is BoardSelectedItem.Item){
-            _status = if(result.isMaximum){
-                GameStatus.Won(
+            return if(result.isMaximum){
+                playerTurn.increaseScore()
+                _status = GameStatus.Won
+                GameTurn(
                     x = result.x,
                     y = result.y,
                     player = playerTurn
@@ -56,28 +57,25 @@ data class Game(
                 val player = playerTurn
                 selectPlayer()
                 if(board.isFull){
-                    GameStatus.Tied(
+                    player.increaseScore()
+                    playerTurn.increaseScore()
+                    _status = GameStatus.Tied
+                    GameTurn(
                         x = result.x,
                         y = result.y,
-                        newPlayer = playerTurn,
                         player = player
                     )
                 } else {
-                    GameStatus.InProgress(
+                    _status = GameStatus.InProgress
+                    GameTurn(
                         x = result.x,
                         y = result.y,
-                        newPlayer = playerTurn,
                         player = player
                     )
                 }
             }
-            return true
         }
-        return false
-    }
-
-    fun isSelected(x: Int, y: Int): Boolean {
-        return matrix[x][y] is BoardItem.Occupied
+        return null
     }
 
 }

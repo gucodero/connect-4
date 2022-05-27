@@ -1,49 +1,62 @@
 package com.gucodero.connect4.ui.main
 
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import com.gucodero.connect4.domain.game.entities.Game
-import com.gucodero.connect4.domain.game.entities.GameStatus
-import com.gucodero.connect4.domain.player.entities.Player
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.gucodero.connect4.domain.game.entities.GameStatus
+import com.gucodero.connect4.domain.game.entities.GameTurn
+import com.gucodero.connect4.domain.game.use_cases.NewGameUseCase
+import com.gucodero.connect4.domain.game.use_cases.ResetGameUseCase
 
-class MainViewModel: ViewModel() {
+class MainViewModel(
+    private val newGameUseCase: NewGameUseCase = NewGameUseCase(),
+    private val resetGameUseCase: ResetGameUseCase = ResetGameUseCase()
+): ViewModel() {
 
-    private val game: Game = Game(
-        players = listOf(
-            Player("Pablo", color = Color.Blue), Player("Francisco", color = Color.Red)
-        )
-    )
+    private var game: Game = newGameUseCase("Pablo", "Francisco")
 
-    private var _uiState by mutableStateOf(
-        MainUiState(
-            width = game.width,
-            height = game.height,
-            players = game.players
-        )
-    )
+    private var _uiState by mutableStateOf(createNewState())
     val uiState get() = _uiState
 
-    fun selectItem(x: Int){
-        val result = game.selectItem(x)
-        if(result){
-            when(val status = game.status){
-                is GameStatus.Won -> {
-                    uiState.matrix["${status.x},${status.y}"] = status.player
-                }
-                is GameStatus.Tied -> {
-                    uiState.matrix["${status.x},${status.y}"] = status.player
-                }
-                is GameStatus.InProgress -> {
-                    uiState.matrix["${status.x},${status.y}"] = status.player
-                }
-            }
-            _uiState = uiState.copy(
-                gameStatus = game.status
-            )
+    private fun createNewState(): MainUiState {
+        return MainUiState(
+            width = game.width,
+            height = game.height,
+            players = game.players.toList(),
+            currentPlayer = game.playerTurn,
+            gameStatus = game.status
+        )
+    }
+
+    fun selectItem(x: Int): GameTurn?{
+        if(game.status != GameStatus.InProgress && game.status != GameStatus.None){
+            return null
         }
+        game.selectItem(x)?.let { gameTurn ->
+            uiState.matrix[gameTurn.getId()] = gameTurn.player
+            refreshTurn()
+            return gameTurn
+        }
+        return null
+    }
+
+    private fun refreshTurn(){
+        _uiState = uiState.copy(
+            currentPlayer = game.playerTurn,
+            gameStatus = game.status
+        )
+    }
+
+    fun resetGame(){
+        game = resetGameUseCase(game)
+        _uiState = createNewState()
+    }
+
+    fun newGame(){
+        game = newGameUseCase("Pablo", "Francisco")
+        _uiState = createNewState()
     }
 
 }

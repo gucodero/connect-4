@@ -51,8 +51,8 @@ class Board(
         var auxCounter = 0
         var counter = 0
         var newCount = true
-        forEachIndexed { index, boardItem ->
-            if(boardItem is BoardItem.Occupied && player === boardItem.player){
+        forEach { boardItem ->
+            if(boardItem is BoardItem.Occupied && player.id == boardItem.player.id){
                 if(newCount){
                     counter = 0
                     newCount = false

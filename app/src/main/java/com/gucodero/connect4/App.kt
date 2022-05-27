@@ -1,4 +1,4 @@
-package com.gucodero.connect4.ui
+package com.gucodero.connect4
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
